@@ -11,7 +11,7 @@ class Contact {
   String phone;
   String image;
 
-  Contact() {}
+  Contact();
 
   Contact.fromMap(Map map) {
     id = map[idColumn];
@@ -21,7 +21,7 @@ class Contact {
     image = map[imgColumn];
   }
 
-  Map toMap() {
+  Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       nameColumn: name,
       emailColumn: email,

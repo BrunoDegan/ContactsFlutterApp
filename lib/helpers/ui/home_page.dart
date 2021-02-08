@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   ContactHelper helper = ContactHelper();
-  List<Contact> contacts = List();
+  List<Contact> contacts = [];
 
   @override
   void initState() {
@@ -87,9 +87,7 @@ class HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                          image: contacts[index].image != null
-                              ? FileImage(File(contacts[index].image))
-                              : AssetImage("images/person.png"),
+                          image: selectCardImage(contacts, index),
                           fit: BoxFit.cover)),
                 ),
                 Padding(
@@ -125,7 +123,7 @@ class HomePageState extends State<HomePage> {
                 padding: EdgeInsets.all(10),
                 child:
                     Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                  FlatButton(
+                  TextButton(
                     child: Text("Ligar",
                         style: TextStyle(color: Colors.red, fontSize: 20.0)),
                     onPressed: () {
@@ -133,7 +131,7 @@ class HomePageState extends State<HomePage> {
                       Navigator.pop((context));
                     },
                   ),
-                  FlatButton(
+                  TextButton(
                     child: Text("Editar",
                         style: TextStyle(color: Colors.red, fontSize: 20.0)),
                     onPressed: () {
@@ -141,7 +139,7 @@ class HomePageState extends State<HomePage> {
                       showContactHomePage(contact: contacts[index]);
                     },
                   ),
-                  FlatButton(
+                  TextButton(
                     child: Text("Excluir",
                         style: TextStyle(color: Colors.red, fontSize: 20.0)),
                     onPressed: () {
@@ -179,15 +177,31 @@ class HomePageState extends State<HomePage> {
       switch (results) {
         case OrderOptions.orderaz:
           contacts.sort((a, b) {
-            return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+            if (a.name != null && b.name != null) {
+              return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+            } else {
+              return 1;
+            }
           });
           break;
         case OrderOptions.orderza:
           contacts.sort((a, b) {
-            return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+            if (a.name != null && b.name != null) {
+              return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+            } else {
+              return 1;
+            }
           });
           break;
       }
     });
+  }
+
+  ImageProvider selectCardImage(List<Contact> contacts, int index) {
+    if (contacts[index].image != null) {
+      return FileImage(File(contacts[index].image));
+    } else {
+      return AssetImage("images/person.png");
+    }
   }
 }
