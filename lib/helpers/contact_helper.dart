@@ -11,21 +11,22 @@ class ContactHelper {
 
   ContactHelper.internal();
 
-  Database database;
+  Database? database;
 
   Future<Database> get db async {
     if (database != null) {
-      return database;
+      return database!;
     } else {
       database = await initDb();
-      return database;
+      return database!;
     }
   }
 
   Future<Database> initDb() async {
     final databasePath = await getDatabasesPath();
 
-    final path = join(databasePath, "contacts_flutter.db");
+    String path = "";
+    if (databasePath != null) path = join(databasePath, "contacts_flutter.db");
 
     return await openDatabase(path, version: 1,
         onCreate: (Database db, int newerVersion) async {
@@ -43,33 +44,32 @@ class ContactHelper {
   Future<int> deleteContact(int id) async {
     Database _db = await db;
     return await _db
-        ?.delete(contactTable, where: "$idColumn = ?", whereArgs: [id]);
+        .delete(contactTable, where: "$idColumn = ?", whereArgs: [id]);
   }
 
   Future<int> updateContact(Contact contact) async {
     Database _db = await db;
-    return await _db?.update(contactTable, contact.toMap(),
+    return await _db.update(contactTable, contact.toMap(),
         where: "$idColumn = ?", whereArgs: [contact.id]);
   }
 
   Future<List<Contact>> getAllContacts() async {
     Database _db = await db;
     List<Map<String, dynamic>> listMap =
-        await _db?.rawQuery("SELECT * FROM $contactTable");
+        await _db.rawQuery("SELECT * FROM $contactTable");
     List<Contact> listContact = [];
-    if (listMap != null) {
-      for (Map map_elem in listMap) {
-        listContact.add(Contact.fromMap(map_elem));
-      }
+
+    for (Map map_elem in listMap) {
+      listContact.add(Contact.fromMap(map_elem));
     }
     return listContact;
   }
 
-  Future<int> getNumber() async {
+  Future<int?> getNumber() async {
     Database _db = await db;
 
     final allContacts =
-        await _db?.rawQuery("SELECT COUNT(*) FROM $contactTable");
+        await _db.rawQuery("SELECT COUNT(*) FROM $contactTable");
     if (allContacts != null)
       return Sqflite.firstIntValue(allContacts);
     else

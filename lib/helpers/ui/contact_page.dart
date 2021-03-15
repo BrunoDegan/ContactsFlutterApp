@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ContactPage extends StatefulWidget {
-  final Contact contact;
+  Contact? contact;
 
   //optional param this.contact
-  ContactPage({this.contact});
+  ContactPage(this.contact);
 
   @override
   State<StatefulWidget> createState() => ContactPageState();
@@ -16,7 +16,7 @@ class ContactPage extends StatefulWidget {
 
 class ContactPageState extends State<ContactPage> {
   bool edited = false;
-  Contact editedContact;
+  late Contact editedContact;
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -32,10 +32,10 @@ class ContactPageState extends State<ContactPage> {
     if (widget.contact == null) {
       editedContact = Contact();
     } else {
-      editedContact = widget.contact;
-      nameController.text = editedContact.name;
-      phoneController.text = editedContact.phone;
-      emailController.text = editedContact.email;
+      editedContact = widget.contact!;
+      nameController.text = editedContact.name ?? "";
+      phoneController.text = editedContact.phone ?? "";
+      emailController.text = editedContact.email ?? "";
     }
   }
 
@@ -46,20 +46,22 @@ class ContactPageState extends State<ContactPage> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.red,
-          title: Text(editedContact.name ?? "Novo contato!"),
+          title: Text(editedContact.name ?? ""),
           centerTitle: true,
         ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.save),
-          backgroundColor: Colors.red,
-          onPressed: () {
-            if (editedContact.name != null && editedContact.name.isNotEmpty) {
-              Navigator.pop(context, editedContact);
-            } else {
-              FocusScope.of(context).requestFocus(nameFocus);
-            }
-          },
-        ),
+            child: Icon(Icons.save),
+            backgroundColor: Colors.red,
+            onPressed: () {
+              if (editedContact != null &&
+                  editedContact.name!.isNotEmpty &&
+                  editedContact.phone != null &&
+                  editedContact.phone!.isNotEmpty) {
+                Navigator.pop(context, editedContact);
+              } else {
+                FocusScope.of(context).requestFocus(nameFocus);
+              }
+            }),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(10.0),
           child: Column(
@@ -84,7 +86,7 @@ class ContactPageState extends State<ContactPage> {
                 onChanged: (text) {
                   edited = true;
                   setState(() {
-                    editedContact?.name = text;
+                    editedContact.name = text;
                   });
                 },
                 controller: nameController,
@@ -94,7 +96,7 @@ class ContactPageState extends State<ContactPage> {
                 decoration: InputDecoration(labelText: "Email"),
                 onChanged: (text) {
                   edited = true;
-                  editedContact?.email = text;
+                  editedContact.email = text;
                 },
                 keyboardType: TextInputType.emailAddress,
                 controller: emailController,
@@ -104,7 +106,7 @@ class ContactPageState extends State<ContactPage> {
                 decoration: InputDecoration(labelText: "Phone"),
                 onChanged: (text) {
                   edited = true;
-                  editedContact?.phone = text;
+                  editedContact.phone = text;
                 },
                 keyboardType: TextInputType.number,
                 controller: phoneController,
@@ -150,7 +152,7 @@ class ContactPageState extends State<ContactPage> {
 
   ImageProvider _selectedImage() {
     if (editedContact.image != null) {
-      return FileImage(File(editedContact.image));
+      return FileImage(File(editedContact.image ?? ""));
     } else {
       return AssetImage("images/person.png");
     }
@@ -164,7 +166,7 @@ class ContactPageState extends State<ContactPage> {
             preferredCameraDevice: CameraDevice.front)
         .then((file) {
       setState(() {
-        editedContact?.image = file.path;
+        editedContact.image = file?.path ?? "";
       });
     });
   }

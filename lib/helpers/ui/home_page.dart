@@ -21,10 +21,10 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    getAllContacts();
+    _getAllContacts();
   }
 
-  void getAllContacts() {
+  void _getAllContacts() {
     helper.getAllContacts().then((list) {
       setState(() {
         contacts = list;
@@ -60,7 +60,7 @@ class HomePageState extends State<HomePage> {
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showContactHomePage();
+          showContactHomePage(null);
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.red,
@@ -136,14 +136,14 @@ class HomePageState extends State<HomePage> {
                         style: TextStyle(color: Colors.red, fontSize: 20.0)),
                     onPressed: () {
                       Navigator.pop(context);
-                      showContactHomePage(contact: contacts[index]);
+                      showContactHomePage(contacts[index]);
                     },
                   ),
                   TextButton(
                     child: Text("Excluir",
                         style: TextStyle(color: Colors.red, fontSize: 20.0)),
                     onPressed: () {
-                      helper.deleteContact(contacts[index].id);
+                      helper.deleteContact(contacts[index].id ?? 0);
                       setState(() {
                         contacts.removeAt(index);
                         Navigator.pop(context);
@@ -158,9 +158,9 @@ class HomePageState extends State<HomePage> {
         });
   }
 
-  void showContactHomePage({Contact contact}) async {
-    final recContact = await Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ContactPage(contact: contact)));
+  void showContactHomePage(Contact? contact) async {
+    final recContact = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ContactPage(contact)));
 
     if (recContact != null) {
       if (contact != null) {
@@ -168,7 +168,7 @@ class HomePageState extends State<HomePage> {
       } else {
         await helper.saveContact(recContact);
       }
-      getAllContacts();
+      _getAllContacts();
     }
   }
 
@@ -177,20 +177,12 @@ class HomePageState extends State<HomePage> {
       switch (results) {
         case OrderOptions.orderaz:
           contacts.sort((a, b) {
-            if (a.name != null && b.name != null) {
-              return a.name.toLowerCase().compareTo(b.name.toLowerCase());
-            } else {
-              return 1;
-            }
+            return a.name!.toLowerCase().compareTo(b.name!.toLowerCase());
           });
           break;
         case OrderOptions.orderza:
           contacts.sort((a, b) {
-            if (a.name != null && b.name != null) {
-              return b.name.toLowerCase().compareTo(a.name.toLowerCase());
-            } else {
-              return 1;
-            }
+            return b.name!.toLowerCase().compareTo(a.name!.toLowerCase());
           });
           break;
       }
@@ -199,7 +191,7 @@ class HomePageState extends State<HomePage> {
 
   ImageProvider selectCardImage(List<Contact> contacts, int index) {
     if (contacts[index].image != null) {
-      return FileImage(File(contacts[index].image));
+      return FileImage(File(contacts[index].image!));
     } else {
       return AssetImage("images/person.png");
     }
